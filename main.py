@@ -1,29 +1,17 @@
-import re
-# import matplotlib.pyplot as plt
-import numpy as np
-from PIL import Image
-import wikipedia
-from wordcloud import WordCloud, STOPWORDS
+from os import path
+import pandas as pd
+from waiting import wait
+from kaggle_.config import api as kaggle_api
 
-
-# def plot_cloud(wordcloud):
-#     plt.figure(figsize=(40, 30))
-#     plt.imshow(wordcloud)
-#     plt.axis("off")
-#     plt.show(block='false')
-
+DATASET_DIR = 'datasets/'
+DATASET_FILENAME = 'winemag-data-130k-v2.csv'
+DATASET_PATH = path.join(DATASET_DIR, DATASET_FILENAME)
 
 if __name__ == '__main__':
-    wiki = wikipedia.page('Web scraping')
-    text = wiki.content
-    text = re.sub(r'==.*?==+', '', text)
-    text = text.replace('\n', '')
+    if not path.exists(DATASET_PATH):
+        kaggle_api.dataset_download_files(
+            'zynicide/wine-reviews', path=DATASET_DIR, force=True, unzip=True)
+        wait(lambda: path.exists(DATASET_PATH),
+             timeout_seconds=120, waiting_for='dataset to download')
 
-    mask = np.array(Image.open('masks/upvote.png'))
-
-    wordcloud = WordCloud(width=3000, height=2000, random_state=1, background_color='salmon',
-                          colormap='Pastel1', collocations=False, stopwords=STOPWORDS, mask=mask).generate(text)
-
-    # plot_cloud(wordcloud)
-
-    wordcloud.to_file("wordclouds/upvote.png")
+    df = pd.read_csv(DATASET_PATH, index_col=0)

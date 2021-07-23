@@ -8,6 +8,10 @@ wordcloud = "*"
 pillow = "*"
 wikipedia = "*"
 numpy = "*"
+pandas = "*"
+kaggle = "*"
+python-dotenv = "*"
+waiting = "*"
 
 [dev-packages]
 autopep8 = "*"
