@@ -8,14 +8,15 @@ wordcloud = "*"
 pillow = "*"
 wikipedia = "*"
 numpy = "*"
-pandas = "*"
 kaggle = "*"
 python-dotenv = "*"
 waiting = "*"
+pandas = "*"
 
 [dev-packages]
 autopep8 = "*"
 pylint = "*"
+ipykernel = "*"
 
 [requires]
 python_version = "3.9"
