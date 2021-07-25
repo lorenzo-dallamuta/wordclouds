@@ -1,6 +1,7 @@
 from os import path
-# from matplotlib import pyplot as plt
+import numpy as np
 import pandas as pd
+from PIL import Image
 from waiting import wait
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 from kaggle_.config import api as kaggle_api
@@ -18,13 +19,31 @@ if __name__ == '__main__':
 
     df = pd.read_csv(DATASET_PATH, index_col=0)
 
-    text = df.description[0]
+    text = " ".join(review for review in df.description)
 
-    wordcloud = WordCloud(
-        max_words=100, background_color="white").generate(text)
+    stopwords = set(STOPWORDS)
+    stopwords.update(["drink", "now", "wine", "flavor", "flavors"])
 
-    # plt.imshow(wordcloud, interpolation='bilinear')
-    # plt.axis("off")
-    # plt.show()
+    # loc_mask = np.array(Image.open("masks/loc.png"))
+    # star_mask = np.array(Image.open("masks/star.png"))
+    wine_mask = np.array(Image.open("masks/wine_mask.png"))
+    # keep it 4 bit
+    transformed_wine_mask = np.ndarray(
+        (wine_mask.shape[0], wine_mask.shape[1]), np.int32)
+    for i in range(len(wine_mask)):
+        transformed_wine_mask[i] = list(
+            map(lambda x: 255 if x == 0 else 0, wine_mask[i]))
+    # make it 24 bit
+    # transformed_wine_mask = np.ndarray(
+    #     (wine_mask.shape[0], wine_mask.shape[1], 4), np.int32)
+    # for i in range(len(wine_mask)):
+    #     transformed_wine_mask[i] = list(
+    #         map(lambda x: (255, 255, 255, 0) if x == 0 else (0, 0, 0, 0), wine_mask[i]))
 
-    wordcloud.to_file("wordclouds/wines.png")
+    wordcloud = WordCloud(random_state=0, width=800, height=600, mask=transformed_wine_mask, stopwords=stopwords,
+                          relative_scaling=1, background_color=None, mode="RGBA")
+    # processed_text = wordcloud.process_text(text)
+    # image = wordcloud.generate_from_frequencies(processed_text)
+    image = wordcloud.generate(text)
+
+    image.to_file("wordclouds/wines.png")
